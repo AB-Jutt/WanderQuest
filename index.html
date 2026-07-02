@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="WanderQuest – Discover world-class tourism spots near you, sorted by price and rating." />
+  <meta name="keywords" content="tourism, travel, places, spots, explore, wanderlust" />
+  <meta name="author" content="WanderQuest Travel Co." />
+  <meta property="og:title" content="WanderQuest – Explore Your World" />
+  <meta property="og:description" content="Find top tourism spots near your location, filter by price, and plan your perfect trip." />
+  <meta property="og:type" content="website" />
+  <title>WanderQuest – Explore Your World</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Leaflet CSS (Free Map API) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ░░ HERO / HEADER ░░ -->
+  <header class="hero" id="hero">
+    <div class="hero-bg-anim"></div>
+    <div class="hero-overlay"></div>
+
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+      <div class="nav-logo">
+        <span class="logo-icon">✦</span>
+        <span class="logo-text">WanderQuest</span>
+      </div>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#explore" class="nav-link">Explore</a></li>
+        <li><a href="#destinations" class="nav-link">Destinations</a></li>
+        <li><a href="#planner" class="nav-link">Planner</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+
+    <div class="hero-content">
+      <p class="hero-eyebrow">Your Journey Begins Here</p>
+      <h1 class="hero-title">Discover Places<br /><em>Worth Exploring</em></h1>
+      <p class="hero-sub">Find world-class tourism spots near you, sorted by price & rating. Let the map guide your adventure.</p>
+      <div class="hero-cta-group">
+        <button class="btn btn-primary" id="locateBtn">
+          <span class="btn-icon">⌖</span> Use My Location
+        </button>
+        <a href="#explore" class="btn btn-ghost">Browse Spots ↓</a>
+      </div>
+    </div>
+
+    
+  </header>
+
+  <!-- ░░ MAIN CONTENT ░░ -->
+  <main>
+
+    <!-- ── EXPLORE SECTION ── -->
+    <section class="section explore-section" id="explore">
+      <div class="container">
+        <div class="section-header">
+          <p class="section-eyebrow">Interactive Map</p>
+          <h2 class="section-title">Find Spots Near You</h2>
+          <p class="section-desc">Click "Use My Location" or search a city to discover tourism spots on the live map.</p>
+        </div>
+
+        <!-- Map + Search Panel -->
+        <div class="map-panel">
+          <div class="map-search-bar">
+            <input type="text" id="cityInput" class="map-search-input" placeholder="Search a city or place…" aria-label="Search city" />
+            <button class="btn btn-primary btn-sm" id="searchCityBtn">Search</button>
+            <button class="btn btn-ghost btn-sm" id="geoBtn">⌖ My Location</button>
+          </div>
+          <div id="map" role="region" aria-label="Interactive tourism map"></div>
+          <p class="map-tip" id="mapStatus">📍 Waiting for location…</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── DESTINATIONS / SPOTS TABLE ── -->
+    <section class="section destinations-section" id="destinations">
+      <div class="container">
+        <div class="section-header">
+          <p class="section-eyebrow">Tourism Spots</p>
+          <h2 class="section-title">Discover &amp; Compare</h2>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-bar" role="search">
+          <input type="text" id="searchInput" class="filter-input" placeholder="🔍 Search spots…" aria-label="Filter spots" />
+
+          <select id="categoryFilter" class="filter-select" aria-label="Filter by category">
+            <option value="">All Categories</option>
+            <option value="museum">Museums</option>
+            <option value="nature">Nature</option>
+            <option value="heritage">Heritage</option>
+            <option value="beach">Beaches</option>
+            <option value="adventure">Adventure</option>
+            <option value="food">Food & Culture</option>
+          </select>
+
+          <select id="priceFilter" class="filter-select" aria-label="Filter by price">
+            <option value="">Any Price</option>
+            <option value="free">Free</option>
+            <option value="low">$ Budget</option>
+            <option value="mid">$$ Mid-range</option>
+            <option value="high">$$$ Premium</option>
+          </select>
+
+          <div class="sort-group">
+            <label for="sortSelect" class="sort-label">Sort by:</label>
+            <select id="sortSelect" class="filter-select" aria-label="Sort spots">
+              <option value="rating">Rating</option>
+              <option value="price-asc">Price ↑</option>
+              <option value="price-desc">Price ↓</option>
+              <option value="name">Name A–Z</option>
+            </select>
+          </div>
+
+          <button class="btn btn-ghost btn-sm" id="resetFilters">✕ Reset</button>
+        </div>
+
+        <!-- Results Count -->
+        <p class="results-count" id="resultsCount">Showing all spots</p>
+
+        <!-- Spots Table (absolute + external references) -->
+        <div class="table-wrapper">
+          <table class="spots-table" id="spotsTable" role="table" aria-label="Tourism spots">
+            <thead>
+              <tr>
+                <th class="th-sortable" data-col="name">Name <span class="sort-arrow">↕</span></th>
+                <th class="th-sortable" data-col="category">Category <span class="sort-arrow">↕</span></th>
+                <th class="th-sortable" data-col="location">Location <span class="sort-arrow">↕</span></th>
+                <th class="th-sortable" data-col="price">Price <span class="sort-arrow">↕</span></th>
+                <th class="th-sortable" data-col="rating">Rating <span class="sort-arrow">↕</span></th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="spotsTableBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Card Gallery Toggle -->
+        <div class="view-toggle">
+          <button class="toggle-btn active" id="tableViewBtn" aria-pressed="true">☰ Table</button>
+          <button class="toggle-btn" id="cardViewBtn" aria-pressed="false">⊞ Cards</button>
+        </div>
+
+        <!-- Spots Card Gallery -->
+        <div class="spots-grid hidden" id="spotsGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ── TRIP PLANNER FORM ── -->
+    <section class="section planner-section" id="planner">
+      <div class="container">
+        <div class="section-header">
+          <p class="section-eyebrow">Plan Your Trip</p>
+          <h2 class="section-title">Build Your Itinerary</h2>
+          <p class="section-desc">Fill in the form and we'll suggest the best spots for your travel style &amp; budget.</p>
+        </div>
+
+        <div class="planner-grid">
+          <form class="planner-form" id="plannerForm" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="fname">First Name <span class="required">*</span></label>
+                <input type="text" id="fname" name="fname" placeholder="e.g. Ahmad" required minlength="2" autocomplete="given-name" />
+                <span class="form-error" id="fnameError"></span>
+              </div>
+              <div class="form-group">
+                <label for="lname">Last Name <span class="required">*</span></label>
+                <input type="text" id="lname" name="lname" placeholder="e.g. Khan" required minlength="2" autocomplete="family-name" />
+                <span class="form-error" id="lnameError"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email Address <span class="required">*</span></label>
+              <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email" />
+              <span class="form-error" id="emailError"></span>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="travelDate">Travel Date <span class="required">*</span></label>
+                <input type="date" id="travelDate" name="travelDate" required />
+                <span class="form-error" id="travelDateError"></span>
+              </div>
+              <div class="form-group">
+                <label for="travelers">No. of Travelers <span class="required">*</span></label>
+                <input type="number" id="travelers" name="travelers" placeholder="2" min="1" max="50" required />
+                <span class="form-error" id="travelersError"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="budget">Budget Range <span class="required">*</span></label>
+              <select id="budget" name="budget" required>
+                <option value="">-- Select budget --</option>
+                <option value="free">Free Only</option>
+                <option value="low">$ Budget (Under $20/person)</option>
+                <option value="mid">$$ Mid-range ($20–$60/person)</option>
+                <option value="high">$$$ Premium ($60+/person)</option>
+              </select>
+              <span class="form-error" id="budgetError"></span>
+            </div>
+
+            <div class="form-group">
+              <label>Travel Style <span class="required">*</span></label>
+              <div class="checkbox-group" id="styleGroup">
+                <label class="check-label"><input type="checkbox" name="style" value="nature" /> 🌿 Nature</label>
+                <label class="check-label"><input type="checkbox" name="style" value="culture" /> 🏛 Culture</label>
+                <label class="check-label"><input type="checkbox" name="style" value="adventure" /> 🧗 Adventure</label>
+                <label class="check-label"><input type="checkbox" name="style" value="food" /> 🍜 Food</label>
+                <label class="check-label"><input type="checkbox" name="style" value="beach" /> 🏖 Beach</label>
+              </div>
+              <span class="form-error" id="styleError"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="notes">Special Notes</label>
+              <textarea id="notes" name="notes" rows="3" placeholder="Any accessibility needs, preferences, or questions…" maxlength="300"></textarea>
+              <span class="char-count" id="charCount">0 / 300</span>
+            </div>
+
+            <div class="form-group terms-group">
+              <label class="check-label">
+                <input type="checkbox" id="terms" name="terms" required />
+                I agree to the <a href="#" class="inline-link">Terms &amp; Conditions</a>
+              </label>
+              <span class="form-error" id="termsError"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">Submit Itinerary ✈</button>
+          </form>
+
+          <!-- Planner Side Panel -->
+          <aside class="planner-aside">
+            <div class="aside-card">
+              <h3>📌 My Saved Spots</h3>
+              <ul id="savedList" class="saved-list">
+                <li class="empty-msg">No spots saved yet.</li>
+              </ul>
+              <button class="btn btn-ghost btn-sm" id="clearSaved">Clear All</button>
+            </div>
+            <div class="aside-card weather-card" id="weatherCard">
+              <h3>🌤 Local Weather</h3>
+              <p class="weather-placeholder">Enable location for weather info</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── IMAGE GALLERY ── -->
+    <section class="section gallery-section" id="gallery">
+      <div class="container">
+        <div class="section-header">
+          <p class="section-eyebrow">Visual Journeys</p>
+          <h2 class="section-title">Gallery of Wonders</h2>
+        </div>
+        <div class="gallery-grid" id="galleryGrid">
+          <div class="gallery-item" style="--i:0" data-caption="Mystical Valleys">
+            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80" alt="Mountain valley landscape" loading="lazy" />
+            <div class="gallery-overlay"><span>Mystical Valleys</span></div>
+          </div>
+          <div class="gallery-item gallery-wide" style="--i:1" data-caption="Ancient Ruins">
+            <img src="https://images.unsplash.com/photo-1539375665275-f9de415ef9ac?w=900&q=80" alt="Ancient stone ruins" loading="lazy" />
+            <div class="gallery-overlay"><span>Ancient Ruins</span></div>
+          </div>
+          <div class="gallery-item" style="--i:2" data-caption="Coastal Wonders">
+            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80" alt="Beautiful beach coastline" loading="lazy" />
+            <div class="gallery-overlay"><span>Coastal Wonders</span></div>
+          </div>
+          <div class="gallery-item" style="--i:3" data-caption="Desert Dunes">
+            <img src="https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=600&q=80" alt="Desert sand dunes" loading="lazy" />
+            <div class="gallery-overlay"><span>Desert Dunes</span></div>
+          </div>
+          <div class="gallery-item gallery-tall" style="--i:4" data-caption="Hidden Waterfalls">
+            <img src="https://images.unsplash.com/photo-1467890947394-8171244e5410?w=600&q=80" alt="Waterfall in forest" loading="lazy" />
+            <div class="gallery-overlay"><span>Hidden Waterfalls</span></div>
+          </div>
+          <div class="gallery-item" style="--i:5" data-caption="City Lights">
+            <img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=600&q=80" alt="City skyline at night" loading="lazy" />
+            <div class="gallery-overlay"><span>City Lights</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+      <button class="lightbox-close" id="lightboxClose" aria-label="Close">✕</button>
+      <img src="" alt="" id="lightboxImg" />
+      <p class="lightbox-caption" id="lightboxCaption"></p>
+    </div>
+
+  </main>
+
+  <!-- ░░ FOOTER ░░ -->
+  <footer class="footer" id="contact">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <div class="nav-logo">
+          <span class="logo-icon">✦</span>
+          <span class="logo-text">WanderQuest</span>
+        </div>
+        <p>Your trusted companion for discovering the world's most breathtaking destinations.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#explore">Map View</a></li>
+          <li><a href="#destinations">Destinations</a></li>
+          <li><a href="#planner">Trip Planner</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Resources</h4>
+        <ul>
+          <!-- External absolute reference links -->
+          <li><a href="https://www.openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a></li>
+          <li><a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo Weather</a></li>
+          <li><a href="https://unsplash.com" target="_blank" rel="noopener">Photo Credits</a></li>
+          <li><a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet.js</a></li>
+        </ul>
+      </div>
+      <div class="footer-contact">
+        <h4>Contact</h4>
+        <p>📧 denverm774@gmail.com</p>
+        <p>📞 +92-315-6055289</p>
+        <p>📍 Gujrat, Pakistan</p>
+        <div class="social-icons">
+          <a href="https://www.instagram.com" target="_blank" rel="noopener" aria-label="Instagram" class="social-icon">IG</a>
+          <a href="https://twitter.com" target="_blank" rel="noopener" aria-label="Twitter" class="social-icon">TW</a>
+          <a href="https://www.facebook.com" target="_blank" rel="noopener" aria-label="Facebook" class="social-icon">FB</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 WanderQuest Travel Co. All rights reserved. Built with ♥ for explorers.</p>
+    </div>
+  </footer>
+
+  <!-- Back to Top -->
+  <button class="back-top" id="backTop" aria-label="Back to top">↑</button>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+  <!-- Form Success Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-icon">✈</div>
+      <h3>Itinerary Submitted!</h3>
+      <p>We've received your trip plan. Check your email for recommendations tailored to your budget and travel style.</p>
+      <button class="btn btn-primary" id="modalClose">Great, thanks!</button>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Main JS -->
+  <script src="script.js"></script>
+</body>
+</html>
