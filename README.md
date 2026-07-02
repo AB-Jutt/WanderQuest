@@ -11,12 +11,6 @@ WanderQuest is a responsive trip planner web application built using HTML, CSS, 
 - 📱 Mobile-friendly and responsive design
 - 📝 Interactive forms and user-friendly interface
 
-## Screenshots
-
-
-
-
-
 ## Technologies Used
 
 - HTML5
